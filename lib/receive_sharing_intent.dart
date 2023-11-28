@@ -14,13 +14,13 @@ class ReceiveSharingIntent {
   static Stream<List<SharedMediaFile>>? _streamMedia;
   static Stream<String>? _streamLink;
 
-  /// Returns a [Future], which completes to one of the following:
+  /// 返回一个 [Future]，它完成以下操作之一：
   ///
-  ///   * the initially stored media uri (possibly null), on successful invocation;
-  ///   * a [PlatformException], if the invocation failed in the platform plugin.
+  ///   *成功调用时最初存储的媒体 uri（可能为 null）；
+  ///   *如果平台插件中调用失败，则抛出 [PlatformException]。
   ///
-  /// NOTE. The returned media on iOS (iOS ONLY) is already copied to a temp folder.
-  /// So, you need to delete the file after you finish using it
+  /// 笔记。 iOS 上返回的媒体（仅限 iOS）已复制到临时文件夹中。
+  /// 所以，使用完后需要删除该文件
   static Future<List<SharedMediaFile>> getInitialMedia() async {
     final json = await _mChannel.invokeMethod('getInitialMedia');
     if (json == null) return [];
@@ -30,41 +30,35 @@ class ReceiveSharingIntent {
         .toList();
   }
 
-  /// Returns a [Future], which completes to one of the following:
+  /// 返回一个 [Future]，它完成以下操作之一：
   ///
-  ///   * the initially stored link (possibly null), on successful invocation;
-  ///   * a [PlatformException], if the invocation failed in the platform plugin.
+  ///   *成功调用时最初存储的链接（可能为空）；
+  ///   *如果平台插件中调用失败，则抛出 [PlatformException]。
   static Future<String?> getInitialText() async {
     return await _mChannel.invokeMethod('getInitialText');
   }
 
-  /// A convenience method that returns the initially stored link
-  /// as a new [Uri] object.
+  /// 一种便捷方法，它将最初存储的链接作为新的 [Uri] 对象返回。
   ///
-  /// If the link is not valid as a URI or URI reference,
-  /// a [FormatException] is thrown.
+  /// 如果链接作为 URI 或 URI 引用无效，则会抛出 [FormatException]。
   static Future<Uri?> getInitialTextAsUri() async {
     final data = await getInitialText();
     if (data == null) return null;
     return Uri.parse(data);
   }
 
-  /// Sets up a broadcast stream for receiving incoming media share change events.
+  /// 设置广播流以接收传入的媒体共享更改事件。
   ///
-  /// Returns a broadcast [Stream] which emits events to listeners as follows:
+  /// 返回一个广播 [Stream]，它向侦听器发出事件，如下所示：
   ///
-  ///   * a decoded data ([List]) event (possibly null) for each successful
-  ///   event received from the platform plugin;
-  ///   * an error event containing a [PlatformException] for each error event
-  ///   received from the platform plugin.
+  ///   *每个成功的解码数据（[List]）事件（可能为空）
+  ///   从平台插件收到的事件；
+  ///   *每个错误事件包含一个 [PlatformException] 的错误事件
+  ///   从平台插件收到。
   ///
-  /// Errors occurring during stream activation or deactivation are reported
-  /// through the `FlutterError` facility. Stream activation happens only when
-  /// stream listener count changes from 0 to 1. Stream deactivation happens
-  /// only when stream listener count changes from 1 to 0.
+  /// 流激活或停用期间发生的错误通过“FlutterError”工具报告。仅当流侦听器计数从 0 更改为 1 时，才会发生流激活。仅当流侦听器计数从 1 更改为 0 时，才会发生流停用。
   ///
-  /// If the app was started by a link intent or user activity the stream will
-  /// not emit that initial one - query either the `getInitialMedia` instead.
+  /// 如果应用程序是由链接意图或用户活动启动的，则流将不会发出初始的 -而是查询“getInitialMedia”。
   static Stream<List<SharedMediaFile>> getMediaStream() {
     if (_streamMedia == null) {
       final stream =
@@ -88,22 +82,18 @@ class ReceiveSharingIntent {
     return _streamMedia!;
   }
 
-  /// Sets up a broadcast stream for receiving incoming link change events.
+  /// 设置广播流以接收传入的链接更改事件。
   ///
-  /// Returns a broadcast [Stream] which emits events to listeners as follows:
+  /// 返回一个广播 [Stream]，它向侦听器发出事件，如下所示：
   ///
-  ///   * a decoded data ([String]) event (possibly null) for each successful
-  ///   event received from the platform plugin;
-  ///   * an error event containing a [PlatformException] for each error event
-  ///   received from the platform plugin.
+  ///   *每个成功的解码数据（[String]）事件（可能为空）
+  ///   从平台插件收到的事件；
+  ///   *每个错误事件包含一个 [PlatformException] 的错误事件
+  ///   从平台插件收到。
   ///
-  /// Errors occurring during stream activation or deactivation are reported
-  /// through the `FlutterError` facility. Stream activation happens only when
-  /// stream listener count changes from 0 to 1. Stream deactivation happens
-  /// only when stream listener count changes from 1 to 0.
+  /// 流激活或停用期间发生的错误通过“FlutterError”工具报告。仅当流侦听器计数从 0 更改为 1 时，才会发生流激活。仅当流侦听器计数从 1 更改为 0 时，才会发生流停用。
   ///
-  /// If the app was started by a link intent or user activity the stream will
-  /// not emit that initial one - query either the `getInitialText` instead.
+  /// 如果应用程序是由链接意图或用户活动启动的，则流将不会发出初始的 -而是查询“getInitialText”。
   static Stream<String> getTextStream() {
     if (_streamLink == null) {
       _streamLink = _eChannelLink.receiveBroadcastStream("text").cast<String>();
@@ -111,15 +101,13 @@ class ReceiveSharingIntent {
     return _streamLink!;
   }
 
-  /// A convenience transformation of the stream to a `Stream<Uri>`.
+  /// 将流方便地转换为“Stream<Uri>”。
   ///
-  /// If the value is not valid as a URI or URI reference,
-  /// a [FormatException] is thrown.
+  /// 如果该值作为 URI 或 URI 引用无效，则会抛出 [FormatException]。
   ///
-  /// Refer to `getTextStream` about error/exception details.
+  /// 有关错误/异常详细信息，请参阅“getTextStream”。
   ///
-  /// If the app was started by a share intent or user activity the stream will
-  /// not emit that initial uri - query either the `getInitialTextAsUri` instead.
+  /// 如果应用程序是由共享意图或用户活动启动的，则流将不会发出该初始 uri -而是查询“getInitialTextAsUri”。
   static Stream<Uri> getTextStreamAsUri() {
     return getTextStream().transform<Uri>(
       new StreamTransformer<String, Uri>.fromHandlers(
@@ -130,25 +118,24 @@ class ReceiveSharingIntent {
     );
   }
 
-  /// Call this method if you already consumed the callback
-  /// and don't want the same callback again
+  /// 如果您已经使用了回调并且不希望再次使用相同的回调，请调用此方法
   static void reset() {
     _mChannel.invokeMethod('reset').then((_) {});
   }
 }
 
 class SharedMediaFile {
-  /// Image or Video path.
-  /// NOTE. for iOS only the file is always copied
+  /// 图像或视频路径。
+  /// 笔记。仅适用于 iOS，文件始终被复制
   final String path;
 
-  /// Video thumbnail
+  /// 视频缩略图
   final String? thumbnail;
 
-  /// Video duration in milliseconds
+  /// 视频时长（以毫秒为单位）
   final int? duration;
 
-  /// Whether its a video or image or file
+  /// 无论是视频、图像还是文件
   final SharedMediaType type;
 
   SharedMediaFile(this.path, this.thumbnail, this.duration, this.type);
